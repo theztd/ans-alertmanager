@@ -1,0 +1,50 @@
+# Managed by ansible core role
+
+{% for sshd_port in sshd_ports %}
+Port {{ sshd_port }}
+{% endfor %}
+
+Protocol {{ sshd_protocol}}
+
+{% if sshd_listen_addresses is defined -%}
+{% for ladr in sshd_listen_addresses -%}
+ListenAddress {{ ladr }}
+{%- endfor %}
+{%- endif %}
+
+
+{% if sshd_host_keys is defined %}
+{% for hk in sshd_host_keys %}
+HostKey {{ hk }}
+{% endfor %}
+{% endif %}
+
+# Logging
+SyslogFacility AUTHPRIV
+LogLevel VERBOSE
+
+# Authentication:
+PermitRootLogin {{ sshd_root_password }}
+PasswordAuthentication {{ sshd_password_authentication }}
+PermitEmptyPasswords no
+ChallengeResponseAuthentication no
+
+UsePAM yes
+StrictModes yes
+UseDNS no   # speedup login
+AcceptEnv LANG LC_*
+PrintMotd no
+
+# Don't need rhost compatibility
+IgnoreRhosts yes
+
+# Kick off idle users
+ClientAliveInterval {{ sshd_client_alive_interval }}
+ClientAliveCountMax 0
+
+MaxSessions 30
+MaxStartups 30
+
+X11Forwarding no
+AllowAgentForwarding {{ sshd_agent_forwarding }}
+#UsePrivilegeSeparation sandbox
