@@ -1,5 +1,5 @@
 ---
 alertmanager_pkg_url: https://github.com/prometheus/alertmanager/releases/download/v0.22.2/alertmanager-0.22.2.linux-amd64.tar.gz
 alertmanager_global: []
-alertmanager_router: []
+alertmanager_route: []
 alertmanager_receivers: [] 

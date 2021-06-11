@@ -1,9 +1,16 @@
 ---
-- name: Download alertmanager package
-  unarchive:
-    remote_src: "{{ alertmanager_pkg_url }}"
-    dest: "/tmp/alertmanager"
-    creates: "/tmp/alertmanager"
+- block:
+  - name: Download alertmanager package
+    get_url:  
+      url: "{{ alertmanager_pkg_url }}"
+      dest: "/tmp/alertmanager.tgz"
+  
+  - name: Install alermanager binaries
+    unarchive:
+      src: "/tmp/alertmanager.tgz"
+      dest: "/tmp"
+      remote_src: yes
+
 
 - name: Generate alertmanager config
   template:
