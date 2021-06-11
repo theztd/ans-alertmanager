@@ -1,16 +1,52 @@
 ---
+- name: create alertmanager system group
+  group:
+    name: "{{ alertmanager_user }}"
+    system: true
+    state: present
+
+- name: Create alertmanager system user
+  user:
+    name: "{{ alertmanager_user }}"
+    system: true
+    shell: "/usr/sbin/nologin"
+    group: "{{ alertmanager_user }}"
+    createhome: false
+
+- name: Create directories
+  file:
+    path: "{{ alertmanager_db_dir }}"
+    state: directory
+    owner: "{{ alertmanager_user }}"
+    mode: 0750
+
 - block:
+  - name: Create temporary directory
+    file:
+      path: "/tmp/alertmanager"
+      state: directory
+
   - name: Download alertmanager package
     get_url:  
       url: "{{ alertmanager_pkg_url }}"
       dest: "/tmp/alertmanager.tgz"
   
-  - name: Install alermanager binaries
+  - name: Extract alermanager binaries
     unarchive:
       src: "/tmp/alertmanager.tgz"
-      dest: "/tmp"
+      dest: "/tmp/alertmanager"
       remote_src: yes
+      extra_opts:
+      - --strip-components=1
 
+  - name: Install alertmanager binaries
+    copy:
+      src: "/tmp/alertmanager/{{ item }}"
+      dest: "/usr/local/bin/{{ item }}"
+      remote_src: yes
+    with_items:
+    - alertmanager
+    - amtool
 
 - name: Generate alertmanager config
   template:
@@ -19,4 +55,18 @@
     mode: 0644
     owner: root
 
+- name: Create alertmanager service
+  template:
+    src: alertmanager.service.j2
+    dest: /etc/systemd/system/alertmanager.service
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Start alertmanager service
+  systemd:
+    name: alertmanager
+    daemon_reload: true
+    state: started
+    enabled: true
 
