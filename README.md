@@ -1,5 +1,5 @@
-Role Name
-=========
+Alertmanager
+============
 
 Simple prometheus alertmanager role
 
