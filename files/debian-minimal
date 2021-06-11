@@ -1,3 +1,0 @@
-# Ansible managed
-APT::Install-Recommends "false";
-APT::Install-Suggests "false";

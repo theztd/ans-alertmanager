@@ -1,7 +1,7 @@
 Role Name
 =========
 
-Basic server configuration (shell, vim, git, htop and other often used tools)
+Simple prometheus alertmanager role
 
 Role Variables
 --------------
@@ -20,7 +20,7 @@ Including an example of how to use your role (for instance, with variables passe
 
     - hosts: all
       roles:
-         - { role: theztd.ans-core }
+         - { role: theztd.ans-alertmanager }
 
 License
 -------
@@ -30,4 +30,4 @@ BSD
 Author Information
 ------------------
 
-Marek Sirovy 2016
+Marek Sirovy 2019

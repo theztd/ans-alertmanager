@@ -1,6 +1,6 @@
 galaxy_info:
   author: Marek Sirovy
-  description: Basic server configuration
+  description: Alertmanager configuration
   company: Marek Sirovy
   license: BSD
 

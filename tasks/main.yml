@@ -1,106 +1,15 @@
 ---
-- name: "Set fqdn {{ fqdn | default(inventory_hostname) }}"
-  hostname:
-    name: "{{ fqdn | default(inventory_hostname) }}"
-  ignore_errors: yes
-  register: hostname_change
+- name: Download alertmanager package
+  unarchive:
+    remote_src: "{{ alertmanager_pkg_url }}"
+    dest: "/tmp/alertmanager"
+    creates: "/tmp/alertmanager"
 
-- name: Re-gather facts because hostname has been updated
-  action: setup
-  when: hostname_change.changed == "true" and hostname_change.failed == "false"
-
-- name: Configure apt to minimize amount of instaled packages
-  copy:
-    src: debian-minimal
-    dest: /etc/apt/apt.conf.d/00_only_required_packages
+- name: Generate alertmanager config
+  template:
+    src: alertmanager.yml.j2
+    dest: /etc/prometheus/alertmanager.yml
     mode: 0644
     owner: root
 
-# Autoupdate
-- name: Debian autoupdate
-  include: autoupdate.yml
-  when: autoupdate_enable == "true"
 
-- name: Manage sshd
-  include: sshd.yml
-
-- name: Disable IPv6
-  copy:
-    src: noIPv6
-    dest: /etc/modprobe.d/noIPv6
-    mode: 0640
-  when: disable_ipv6 == "true"
-
-- name: Advanced networking
-  lineinfile:
-    line: "source /etc/network/interfaces.d/*"
-    path: "/etc/network/interfaces"
-    state: present
-
-- name: Configure internal ip
-  template:
-    src: iface.j2
-    dest: "/etc/network/interfaces.d/{{ internal_if }}"
-    mode: 0644
-  when: internal_ip is defined and internal_if is defined
-
-- name: "Turn interface {{ internal_if }} up"
-  command: "ifup {{ internal_if }}"
-  when: internal_if is defined
-
-- name: Configure resolv
-  include: resolv.yml
-  when: resolv is defined
-
-- name: Configure internal DNS via hosts (skip when limit is set)
-  blockinfile:
-    dest: /etc/hosts
-    content: "{{ lookup('template', 'hosts.j2') }}"
-    state: present
-  when: ansible_limit is not defined
-  tags:
-  - hosts
-
-- name: Configure bash
-  copy:
-    src: 00-custom_bash.sh
-    dest: /etc/profile.d/00-custom_bash.sh
-    mode: 0755
-    owner: root
-
-- name: Clean etc skel
-  file:
-    path: /etc/skel/.bashrc
-    state: absent
-
-- name: Copy vim configuration
-  copy:
-    src: vimrc
-    dest: "{{ item }}"
-    owner: root
-  with_items:
-  - /etc/vim/vimrc
-  - /etc/vim/virc
-
-- name: Rsyslog
-  include: rsyslog.yml
-
-- name: Update cache
-  apt:
-    update_cache: yes
-
-- name: Install core packages
-  apt:
-    state: present
-    name: "{{ core_packages }}"
-
-- name: OS filesystem hardening
-  include: perms.yml
-  when: hardening_os == "true"
-
-- name: Sysctl hardening
-  template:
-    src: sysctl.conf
-    dest: /etc/sysctl.d/hardening.conf
-    mode: 0640
-  when: hardening_os == "true"

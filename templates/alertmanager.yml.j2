@@ -1,0 +1,12 @@
+# Managed by ansible
+# jinja2: lstrip_blocks: True
+global:
+{{ alertmanager_global | to_nice_yaml(indent=2) }}
+
+route:
+{{ alertmanager_route | to_nice_yaml(indent=2) }}
+
+
+receivers:
+{{ alertmanager_receivers | to_nice_yaml(indent=2) }}
+
