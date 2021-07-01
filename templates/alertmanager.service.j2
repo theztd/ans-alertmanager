@@ -11,7 +11,9 @@ PIDFile=/var/run/alertmanager.pid
 User=alertmanager
 Group=alertmanager
 ExecReload=/bin/kill -HUP $MAINPID
-ExecStart=/usr/local/bin/alertmanager --config.file=/etc/prometheus/alertmanager.yml
+ExecStart=/usr/local/bin/alertmanager \
+    --config.file=/etc/prometheus/alertmanager.yml \
+    --web.external-url="{{ alertmanager_external_url }}"
 WorkingDirectory={{ alertmanager_db_dir }}
 SyslogIdentifier=alertmanager
 Restart=always

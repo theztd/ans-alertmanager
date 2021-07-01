@@ -1,4 +1,5 @@
 ---
+alertmanager_external_url: ""
 alertmanager_pkg_url: https://github.com/prometheus/alertmanager/releases/download/v0.22.2/alertmanager-0.22.2.linux-amd64.tar.gz
 alertmanager_user: alertmanager
 alertmanager_db_dir: /var/lib/alertmanager
